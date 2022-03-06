@@ -63,10 +63,12 @@ window.onload = function() {
     app.ticker.add(gameLoop);
     app.ticker.add(collisionCheck);
     app.ticker.add(displayScore);
-    app.ticker.add(checkScore);
 
     console.log(scoreVariable);
-    //displayScore();
+
+    // if (scoreVariable === 34) {
+    //     alert("Success");
+    // }
 }
 
 function getRandomInt(min, max) {
@@ -182,12 +184,6 @@ function displayScore() {
     playerScore.x = 700;
     playerScore.y = 50;
     app.stage.addChild(playerScore);
-}
-
-function checkScore() {
-    if (scoreVariable === 35) {
-        confirm("SUCCESS! Do you want to play it again?");
-    }
 }
 
 function keysDown(e) {

@@ -1,11 +1,23 @@
 # GraphicsGame
+Alif Jakir, Serin Yoon, Jennifer Reyes
+
+---
+
+The Game: TONY WORLD
+
 A game for our CS452 Graphics Class. You are the president of the school and you need to absorb everyone and everything.
 
-# Pseudocode:
-# We have one sprite and it's a circle. This is the player. It needs to be able to be played with the wasd keys and the arrow keys.
-# We need to have a map, we define the geometry of where you can and cannot go. We have to figure out the bounding boxes for the map
-# There will be circles in the environment, when you move over them they disappear and you become either bigger or smaller.
-# Green square consumption makes you bigger, and red triangle consumption makes you smaller.
-# 1200 width x 800 height clipspace
-# 
+
+How we made the code:
+
+We first determined how to create a PIXI environment, with a player character sprite.
+We added the background color next. Then we added keyboard and arrow key control of the player sprite with our event handlers.
+There was then the construction of several functions that defined random vertices and geometries of small 2d objects and distributed them across the clipspace.
+We also created some static sprite circles that got distributed as well.
+We created a function  that made it so that when the player character was near the boundaries of the objects,
+it will make the object transparent, increase the size of the player, and add one to the score. We created a collision function that used
+boolean expressions to see if the objects collided.
+The win condition was made such that when all the objects are eaten by the player, they win.
+There is also two large rectangles in the background in order to create some variety to the background environment.
+The score is shown on the top right side of the screen, and it updates through a global variable.
 

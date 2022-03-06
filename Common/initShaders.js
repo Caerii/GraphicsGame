@@ -1,4 +1,4 @@
-//Alif Jakir, Jennifer Reyes
+//Serin Yoon, Alif Jakir, Jennifer Reyes
 //
 //  LoadShaders.js
 //
