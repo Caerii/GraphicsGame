@@ -1,24 +1,28 @@
 let app;
 let keys = {}; // stores the key press
 let player;
+let reloadBtn;
 let characterList = [];
+let outer;
+let inner;
 var width = 800;
 var height = 450;
 var scoreVariable = 0;
-var charScaleX = 0.05;
-var charScaleY = 0.05;
+var charScaleX = 0.03;
+var charScaleY = 0.03;
 let playerScore = 0;
 
 window.onload = function() {
     app = new PIXI.Application({
         width: width,
         height: height,
-        backgroundColor: 0x66FDFF,
+        backgroundColor: 0x95DAEE,
         resolution: window.devicePixelRatio || 1,
     });
     document.body.appendChild(app.view);
 
-    // Creates "rooms"
+    // Create room
+    //   create the environment, which is a series of large polygons that represent a room
     createEnvironment();
 
     // Create 20 random shapes scattered around the environment
@@ -26,49 +30,81 @@ window.onload = function() {
         createShape();
     }
 
-    // Create 4 random characters
-    local_x = getRandomInt(0,width);
-    local_y = getRandomInt(0,height);
+    // Create 5 random characters and place it
+    //   create a new character sprite object
+    //   have an array of various sprites that we can randomly select from for the sprite
+    //   randomly place sprite within map boundaries
+    //   have a flag that makes the sprite object turn transparent after the player goes over it
+    //   (if they are certain size)
+
+    local_x = getRandomInt(70, width - 80);
+    local_y = getRandomInt(110, height - 70);
     createCharacter(local_x, local_y);
 
-    local_x = getRandomInt(0,width);
-    local_y = getRandomInt(0,height);
+    local_x = getRandomInt(70, width - 80);
+    local_y = getRandomInt(100, height - 70);
     createCharacter(local_x, local_y);
 
-    local_x = getRandomInt(0,width);
-    local_y = getRandomInt(0,height);
+    local_x = getRandomInt(70, width - 80);
+    local_y = getRandomInt(100, height - 70);
     createCharacter(local_x, local_y);
 
-    local_x = getRandomInt(0,width);
-    local_y = getRandomInt(0,height);
+    local_x = getRandomInt(70, width - 80);
+    local_y = getRandomInt(100, height - 70);
     createCharacter(local_x, local_y);
 
-    // Create player
+    local_x = getRandomInt(70, width - 80);
+    local_y = getRandomInt(100, height - 70);
+    createCharacter(local_x, local_y);
+
+    // Create reload button
+    displayReloadBtn();
+    reloadBtn.interactive = true;
+    reloadBtn.buttonMode = true;
+    reloadBtn.on('pointerdown', reloadBtnClick)
+
+    // Create a player
     createPlayer();
 
     // Set title
-    var title = new PIXI.Text("Tony World", {align: "center"});
+    var title = new PIXI.Text("Tony World!", {
+        //align: "center", fontFamily: "Courier New"
+        fontFamily: 'Arial',
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#fecd0f', '#054f42'], // gradient
+        stroke: '#ffffff',
+        strokeThickness: 2,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 6,
+        dropShadowDistance: 3,
+        wordWrap: true,
+        wordWrapWidth: 500,
+        lineJoin: 'round',
+    });
+
     title.anchor.set(0.5);
-    title.x = width / 2;
+    title.x = width / 2 + 5;
     title.y = 30;
     app.stage.addChild(title);
 
-    // after it checks if the objects are colliding, if the area of the object is smaller than the player
-    // the object will disappear/become transparent, and then the player width+height will increase by .01 scale
+    // After it checks if the objects are colliding, if the area of the object is smaller than the player,
+    // the object will disappear/become transparent, and then the player's width & height will increase by .01 scale
+    app.ticker.add(collisionCheck);
 
-    // keyboard event handlers
+    // Keyboard event handlers
     window.addEventListener("keydown", keysDown); // key pressed
     window.addEventListener("keyup", keysUp); // key not pressed
-
     app.ticker.add(gameLoop);
-    app.ticker.add(collisionCheck);
+
+    // Check score
     app.ticker.add(displayScore);
 
-    console.log(scoreVariable);
+    // Rotate the player
+    app.ticker.add(() => { player.rotation += 0.05 })
 
-    // if (scoreVariable === 34) {
-    //     alert("Success");
-    // }
 }
 
 function getRandomInt(min, max) {
@@ -81,8 +117,8 @@ function createPlayer() {
     player = new PIXI.Sprite.from('Tony.png');
     player.anchor.set(0.5);
     player.x = width / 2;
-    player.y = height / 2;
-    player.scale.set(0.05, 0.05);
+    player.y = height / 2 + 25;
+    player.scale.set(charScaleX, charScaleY);
     app.stage.addChild(player);
 }
 
@@ -95,56 +131,43 @@ function createCharacter(x, y) {
     character.scale.set(charScaleX, charScaleY);
     app.stage.addChild(character);
     characterList.push(character);
-    //haracterBoolList.push(1);
-    // create a new player sprite object
-    // have an array of various sprites that we can randomly select from for the sprite
-    // randomly place sprite within map boundaries
-    // have a flag that makes the sprite object turn transparent after the player goes over it (if they are certain size)
 }
 
 function createShape() {
-    var g = new PIXI.Graphics();
-    g.beginFill(getRandomColor()); //fills polygon with 8 random colors
-    g.drawPolygon(
-        getRandomInt(-15,0),
-        getRandomInt(-15,0),
-        getRandomInt(-15,0),
-        getRandomInt(0,15),
-        getRandomInt(0,15),
-        getRandomInt(0,15),
-        getRandomInt(0,15),
-        getRandomInt(-15,0),
-        getRandomInt(-15,15),
-        getRandomInt(-15,15)
+    var shape = new PIXI.Graphics();
+    shape.beginFill(getRandomColor()); // fills polygon with 8 random colors
+    shape.drawPolygon(
+        getRandomInt(-15, 0),
+        getRandomInt(-15, 0),
+        getRandomInt(-15, 0),
+        getRandomInt(0, 15),
+        getRandomInt(0, 15),
+        getRandomInt(0, 15),
+        getRandomInt(0, 15),
+        getRandomInt(-15, 0),
+        getRandomInt(-15, 15),
+        getRandomInt(-15, 15)
     );
-    //g.anchor.set(0.5); //sets center of object
-    g.x = getRandomInt(0, width - 100); //random position x of object
-    g.y = getRandomInt(0, height - 100); //random position y of object
-    g.endFill();
 
-    app.stage.addChild(g);
-    characterList.push(g); //adds to the characterList to be able to index the object
-    //characterBoolList.push(0); //smaller objects get a 0 value in
+    shape.x = getRandomInt(70, width - 80); // random position x of object
+    shape.y = getRandomInt(100, height - 70); // random position y of object
+    shape.endFill();
+
+    app.stage.addChild(shape);
+    characterList.push(shape); // adds to the characterList to be able to index the object
 }
 
 function createEnvironment() {
-    //This will create the environment, which is a series of large polygons that represent a room
-    var g = new PIXI.Graphics();
-    var g2 = new PIXI.Graphics();
-    g.beginFill(0x544d3b);
-    g2.beginFill(0xd48257);
-    g.drawPolygon(
-        50, 50, 50, 330, 300, 330, 300, 50
-    );
-    g2.drawPolygon(
-        60, 60, 60, 320, 290, 320, 290, 60
-    );
-
-    g.endFill();
-    g2.endFill();
-
-    app.stage.addChild(g);
-    app.stage.addChild(g2);
+    outer = new PIXI.Graphics();
+    inner = new PIXI.Graphics();
+    outer.beginFill(0x544d3b);
+    inner.beginFill(0xd48257);
+    outer.drawPolygon(50, 70, 50, 430, 750, 430, 750, 70);
+    inner.drawPolygon(60, 80, 60, 420, 740, 420, 740, 80);
+    outer.endFill();
+    inner.endFill();
+    app.stage.addChild(outer);
+    app.stage.addChild(inner);
 }
 
 function getRandomColor() {
@@ -161,12 +184,13 @@ function collisionCheck() {
     for (var i = 0; i < characterList.length; i++) {
         character = characterList[i];
         characterBox = character.getBounds();
-        if (playerBox.x + playerBox.width > characterBox.x && playerBox.x < characterBox.x + characterBox.width && playerBox.y + playerBox.height > characterBox.y && playerBox.y < characterBox.y + characterBox.height) {
-            console.log('collided with', character);
+        if (playerBox.x + playerBox.width > characterBox.x
+            && playerBox.x < characterBox.x + characterBox.width
+            && playerBox.y + playerBox.height > characterBox.y
+            && playerBox.y < characterBox.y + characterBox.height) {
             app.stage.removeChild(character);
             characterList.splice(i, 1);
             scoreVariable += 1; //add one to global score variable
-            console.log(scoreVariable)
             player.width += 2;
             player.height += 2;
         }
@@ -177,13 +201,33 @@ function displayScore() {
     app.stage.removeChild(playerScore);
     let text = "Score: " + scoreVariable
     playerScore = new PIXI.Text(text, {
-        fontFamily: 'Roboto',
-        fill: [0x4b0082],
-        fontSize: 20,
+        align: "center",
+        fontFamily: "Courier New",
+        fontSize: 16,
     })
-    playerScore.x = 700;
-    playerScore.y = 50;
+
+    playerScore.x = 660;
+    playerScore.y = 45;
     app.stage.addChild(playerScore);
+
+    if (scoreVariable === 35) {
+        location.reload();
+        alert("Success! You can play it again!");
+    }
+}
+
+function displayReloadBtn() {
+    reloadBtn = new PIXI.Sprite.from('reload.png');
+    reloadBtn.anchor.set(0.5);
+    reloadBtn.x = 70;
+    reloadBtn.y = 55;
+    reloadBtn.scale.set(0.007, 0.007);
+    app.stage.addChild(reloadBtn);
+}
+
+function reloadBtnClick() {
+    console.log('clicked')
+    location.reload();
 }
 
 function keysDown(e) {
@@ -194,23 +238,21 @@ function keysUp(e) {
     keys[e.keyCode] = false;
 }
 
-// TODO : space (if tony eats something, he can use booster using space key) - 32
-
 function gameLoop() {
     // UP (W or ↑)
     if (keys['87'] || keys['38']) {
-        player.y -= 5;
+        player.y -= 3;
     }
     // LEFT (A or ←)
     if (keys['65'] || keys['37']) {
-        player.x -= 5;
+        player.x -= 3;
     }
     // DOWN (S or ↓)
     if (keys['83'] || keys['40']) {
-        player.y += 5;
+        player.y += 3;
     }
     // RIGHT (D or →)
     if (keys['68'] || keys['39']) {
-        player.x += 5;
+        player.x += 3;
     }
 }
