@@ -1,3 +1,5 @@
+// Alif Jakir, Serin Yoon, Jennifer Reyes
+
 let app;
 let keys = {}; // stores the key press
 let player;
