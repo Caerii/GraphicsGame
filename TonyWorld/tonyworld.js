@@ -68,7 +68,6 @@ window.onload = function() {
 
     // Set title
     var title = new PIXI.Text("Tony World!", {
-        //align: "center", fontFamily: "Courier New"
         fontFamily: 'Arial',
         fontStyle: 'italic',
         fontWeight: 'bold',
@@ -84,11 +83,20 @@ window.onload = function() {
         wordWrapWidth: 500,
         lineJoin: 'round',
     });
-
     title.anchor.set(0.5);
     title.x = width / 2 + 5;
     title.y = 30;
     app.stage.addChild(title);
+
+    // Set explanation
+    var text = "You have to eat everything in school. You can eat if you get close.\nYou can get 1 point each time you eat. If you get 35 points, you win the game.\nYou can move your character up, down, left, and right by pressing the arrow keys or WSAD keys.\nYou can restart the game by pressing the refresh button."
+    var explanation = new PIXI.Text(text, {
+        fontFamily: "Courier New",
+        fontSize: 10,
+    })
+    explanation.x = width / 2 - 330;
+    explanation.y = 370;
+    app.stage.addChild(explanation);
 
     // After it checks if the objects are colliding, if the area of the object is smaller than the player,
     // the object will disappear/become transparent, and then the player's width & height will increase by .01 scale
